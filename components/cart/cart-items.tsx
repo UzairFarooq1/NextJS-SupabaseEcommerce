@@ -119,7 +119,7 @@ export default function CartItems({ items: initialItems }: { items: any[] }) {
               </Link>
 
               <p className="text-sm text-muted-foreground mt-1">
-                ${item.products.price.toFixed(2)}
+                Ksh{item.products.price.toFixed(2)}
               </p>
 
               <div className="flex items-center gap-2 mt-auto">
@@ -167,7 +167,7 @@ export default function CartItems({ items: initialItems }: { items: any[] }) {
               </Button>
 
               <p className="font-medium">
-                ${(item.products.price * item.quantity).toFixed(2)}
+                Ksh{(item.products.price * item.quantity).toFixed(2)}
               </p>
             </div>
           </div>

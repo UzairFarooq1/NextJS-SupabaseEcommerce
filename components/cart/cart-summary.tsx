@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function CartSummary({ items: initialItems }: { items: any[] }) {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -26,19 +27,11 @@ export default function CartSummary({ items: initialItems }: { items: any[] }) {
     0
   );
 
-  // Calculate shipping (free over $100)
+  // Calculate shipping (free over Ksh100)
   const shipping = subtotal >= 100 ? 0 : 10;
 
   // Calculate total
   const total = subtotal + shipping;
-
-  const handleCheckout = () => {
-    setIsCheckingOut(true);
-    // In a real app, you would redirect to checkout page or process payment
-    setTimeout(() => {
-      setIsCheckingOut(false);
-    }, 2000);
-  };
 
   return (
     <Card>
@@ -48,36 +41,40 @@ export default function CartSummary({ items: initialItems }: { items: any[] }) {
       <CardContent className="space-y-4">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>Ksh{subtotal.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between">
           <span className="text-muted-foreground">Shipping</span>
-          <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+          <span>{shipping === 0 ? "Free" : `KshKsh{shipping.toFixed(2)}`}</span>
         </div>
 
         <Separator />
 
         <div className="flex justify-between font-medium">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>Ksh{total.toFixed(2)}</span>
         </div>
 
         {subtotal < 100 && (
           <p className="text-xs text-muted-foreground mt-2">
-            Add ${(100 - subtotal).toFixed(2)} more to qualify for free
+            Add Ksh{(100 - subtotal).toFixed(2)} more to qualify for free
             shipping.
           </p>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-2">
         <Button
           className="w-full"
-          onClick={handleCheckout}
           disabled={isCheckingOut || items.length === 0}
+          asChild
         >
-          {isCheckingOut ? "Processing..." : "Checkout"}
+          <Link href="/checkout">Proceed to Checkout</Link>
         </Button>
+
+        <p className="text-xs text-center text-muted-foreground">
+          Secure checkout with M-Pesa or PayPal
+        </p>
       </CardFooter>
     </Card>
   );

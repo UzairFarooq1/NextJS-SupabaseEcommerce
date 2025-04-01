@@ -47,7 +47,7 @@ export default async function ProductPage({
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <div className="mt-2">
             <span className="text-2xl font-semibold">
-              ${product.price.toFixed(2)}
+              Ksh{product.price.toFixed(2)}
             </span>
           </div>
 
@@ -93,7 +93,7 @@ export default async function ProductPage({
             {relatedProducts.map((relatedProduct) => (
               <a
                 key={relatedProduct.id}
-                href={`/products/${relatedProduct.slug}`}
+                href={`/products/Ksh{relatedProduct.slug}`}
                 className="group overflow-hidden rounded-lg border border-border p-3 hover:border-primary/50"
               >
                 <div className="aspect-square w-full relative mb-3 bg-muted rounded-md overflow-hidden">
@@ -113,7 +113,7 @@ export default async function ProductPage({
                     {relatedProduct.name}
                   </h3>
                   <p className="font-semibold mt-2">
-                    ${relatedProduct.price.toFixed(2)}
+                    Ksh{relatedProduct.price.toFixed(2)}
                   </p>
                 </div>
               </a>

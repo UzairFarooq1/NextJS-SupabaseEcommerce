@@ -47,7 +47,7 @@ export default function ProductCard({
             {product.categories.name}
           </p>
         )}
-        <p className="mt-2 font-semibold">${product.price.toFixed(2)}</p>
+        <p className="mt-2 font-semibold">Ksh{product.price.toFixed(2)}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <AddToCartButton product={product} variant="secondary" />

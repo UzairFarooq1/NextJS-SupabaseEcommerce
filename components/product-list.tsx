@@ -94,7 +94,7 @@ export default async function ProductList({
             <p className="text-sm text-muted-foreground line-clamp-1">
               {product.categories?.name}
             </p>
-            <p className="font-semibold mt-2">${product.price.toFixed(2)}</p>
+            <p className="font-semibold mt-2">Ksh{product.price.toFixed(2)}</p>
           </div>
         </Link>
       ))}

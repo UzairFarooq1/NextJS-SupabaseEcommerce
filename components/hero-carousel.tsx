@@ -87,19 +87,20 @@ export default function HeroCarousel() {
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70" />
             </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 md:p-8">
+              {/* Responsive text sizes */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4 drop-shadow-md">
                 {item.title}
               </h2>
-              <p className="text-lg md:text-xl mb-4 md:mb-6 max-w-md">
+              <p className="text-base sm:text-lg md:text-xl mb-4 md:mb-6 max-w-md mx-auto drop-shadow-md">
                 {item.description}
               </p>
               <Link href={item.link}>
                 <Button
                   size="lg"
-                  className="bg-white text-black hover:bg-white/90"
+                  className="bg-white text-black hover:bg-white/90 text-sm sm:text-base"
                 >
                   Shop Now
                 </Button>
@@ -109,31 +110,33 @@ export default function HeroCarousel() {
         ))}
       </div>
 
+      {/* Larger, more accessible navigation buttons */}
       <Button
         variant="ghost"
         size="icon"
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white rounded-full hover:bg-black/50"
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full hover:bg-black/70 h-10 w-10 sm:h-12 sm:w-12"
         onClick={prev}
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
         <span className="sr-only">Previous slide</span>
       </Button>
 
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white rounded-full hover:bg-black/50"
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full hover:bg-black/70 h-10 w-10 sm:h-12 sm:w-12"
         onClick={next}
       >
-        <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
         <span className="sr-only">Next slide</span>
       </Button>
 
+      {/* Larger, more visible indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {items.map((_, index) => (
           <button
             key={index}
-            className={`w-2.5 h-2.5 rounded-full ${
+            className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${
               current === index ? "bg-white" : "bg-white/50"
             }`}
             onClick={() => setCurrent(index)}

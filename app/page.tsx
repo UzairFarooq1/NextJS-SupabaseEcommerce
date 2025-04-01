@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import HeroCarousel from "@/components/hero-carousel";
+import { getUserCartItems } from "@/lib/cart";
 
 export default async function Home() {
   const supabase = getSupabaseServer();
@@ -20,15 +21,29 @@ export default async function Home() {
     .select("*")
     .limit(5);
 
+  // Fetch user's cart items
+  let cartItemsMap: Record<string, number> = {};
+  try {
+    const cartItems = await getUserCartItems();
+
+    // Create a map of product_id to quantity for easy lookup
+    cartItemsMap = cartItems.reduce((acc, item) => {
+      acc[item.product_id] = item.quantity;
+      return acc;
+    }, {} as Record<string, number>);
+  } catch (error) {
+    console.error("Error fetching cart items:", error);
+  }
+
   return (
-    <div className="flex flex-col gap-12 py-6 w-full max-w-7xl mx-auto">
+    <div className="flex flex-col gap-12 py-6">
       {/* Hero carousel section */}
-      <section className="w-full px-4 md:px-6">
+      <section className="container px-4 md:px-6">
         <HeroCarousel />
       </section>
 
       {/* Featured categories */}
-      <section className="w-full px-4 md:px-6">
+      <section className="container px-4 md:px-6">
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold tracking-tight">
             Shop by Category
@@ -64,7 +79,7 @@ export default async function Home() {
       </section>
 
       {/* Featured products */}
-      <section className="w-full px-4 md:px-6">
+      <section className="container px-4 md:px-6">
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold tracking-tight">
             Featured Products
@@ -87,6 +102,11 @@ export default async function Home() {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
+                  {cartItemsMap[product.id] > 0 && (
+                    <div className="absolute top-2 right-2 bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                      {cartItemsMap[product.id]}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <h3 className="font-medium line-clamp-1">{product.name}</h3>
@@ -108,8 +128,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Promotional banner */}
-      <section className="w-full px-4 md:px-6">
+      {/* Improved mobile-friendly promotional banner */}
+      <section className="container px-4 md:px-6">
         <div className="relative overflow-hidden rounded-lg">
           <div className="aspect-[21/9] w-full relative">
             <Image
@@ -119,20 +139,20 @@ export default async function Home() {
               className="object-cover"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70" />
           </div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-            <h2 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-6 md:p-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4 drop-shadow-md">
               Special Offer
             </h2>
-            <p className="text-lg md:text-xl mb-4 md:mb-6 max-w-md">
+            <p className="text-base sm:text-lg md:text-xl mb-4 md:mb-6 max-w-md mx-auto drop-shadow-md">
               Get 20% off on your first purchase. Use code WELCOME20 at
               checkout.
             </p>
             <Link href="/products">
               <Button
                 size="lg"
-                className="bg-white text-black hover:bg-white/90"
+                className="bg-white text-black hover:bg-white/90 text-sm sm:text-base"
               >
                 Shop Now
               </Button>

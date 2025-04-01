@@ -131,20 +131,7 @@ export default function HeroCarousel() {
         <span className="sr-only">Next slide</span>
       </Button>
 
-      {/* Larger, more visible indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {items.map((_, index) => (
-          <button
-            key={index}
-            className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${
-              current === index ? "bg-white" : "bg-white/50"
-            }`}
-            onClick={() => setCurrent(index)}
-          >
-            <span className="sr-only">Go to slide {index + 1}</span>
-          </button>
-        ))}
-      </div>
+      {/* Removed the dots that were blocking the Shop Now button */}
     </div>
   );
 }

@@ -40,8 +40,8 @@ export default function TeamSection() {
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          The passionate people behind NextShop who work tirelessly to bring you
-          the best shopping experience.
+          The passionate people behind Prime Picks who work tirelessly to bring
+          you the best shopping experience.
         </p>
       </div>
 

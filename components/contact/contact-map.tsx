@@ -22,10 +22,8 @@ export default function ContactMap() {
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-background/90 backdrop-blur-sm p-4 rounded-lg shadow-lg max-w-xs text-center">
-            <h3 className="font-semibold mb-1">NextShop Headquarters</h3>
-            <p className="text-sm text-muted-foreground">
-              123 Commerce Street, New York, NY 10001
-            </p>
+            <h3 className="font-semibold mb-1">Prime Picks Headquarters</h3>
+            <p className="text-sm text-muted-foreground">Westlands, Nairobi</p>
           </div>
         </div>
       </div>

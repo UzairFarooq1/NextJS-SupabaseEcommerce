@@ -18,7 +18,7 @@ export default function AboutHero() {
         <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-20">
           <div className="max-w-2xl">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              About NextShop
+              About Prime Picks
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-xl">
               We're on a mission to provide quality products at affordable

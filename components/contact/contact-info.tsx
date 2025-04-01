@@ -19,16 +19,6 @@ export default function ContactInfo() {
             <div className="p-2 rounded-full bg-primary/10 text-primary">
               <MapPin className="h-5 w-5" />
             </div>
-            <div>
-              <h3 className="font-medium">Address</h3>
-              <p className="text-muted-foreground">
-                123 Commerce Street
-                <br />
-                Suite 500
-                <br />
-                New York, NY 10001
-              </p>
-            </div>
           </div>
 
           <div className="flex items-start gap-3">
@@ -39,7 +29,7 @@ export default function ContactInfo() {
               <h3 className="font-medium">Phone</h3>
               <p className="text-muted-foreground">
                 <a href="tel:+12125551234" className="hover:text-primary">
-                  +1 (212) 555-1234
+                  +254 791 495274
                 </a>
               </p>
             </div>
@@ -52,11 +42,8 @@ export default function ContactInfo() {
             <div>
               <h3 className="font-medium">Email</h3>
               <p className="text-muted-foreground">
-                <a
-                  href="mailto:support@nextshop.com"
-                  className="hover:text-primary"
-                >
-                  support@nextshop.com
+                <a href="uzairf2580@gmail.com" className="hover:text-primary">
+                  uzairf2580@gmail.com
                 </a>
               </p>
             </div>
@@ -69,9 +56,9 @@ export default function ContactInfo() {
             <div>
               <h3 className="font-medium">Business Hours</h3>
               <p className="text-muted-foreground">
-                Monday - Friday: 9:00 AM - 6:00 PM
+                Monday - Friday: 9:00 AM - 4:00 PM
                 <br />
-                Saturday: 10:00 AM - 4:00 PM
+                Saturday: 10:00 AM - 2:00 PM
                 <br />
                 Sunday: Closed
               </p>

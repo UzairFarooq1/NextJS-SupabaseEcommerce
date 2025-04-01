@@ -11,7 +11,7 @@ import { CartProvider } from "@/context/cart-context";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NextShop - Your Modern Ecommerce Store",
+  title: "Prime Picks - Your Modern Ecommerce Store",
   description: "Shop the latest products with our modern ecommerce platform",
   generator: "v0.dev",
 };

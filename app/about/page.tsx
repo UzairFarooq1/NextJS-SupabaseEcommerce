@@ -16,19 +16,27 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col gap-16 py-8 md:py-12">
       {/* Hero Section */}
-      <AboutHero />
+      <section className="container mx-auto px-4 max-w-6xl">
+        <AboutHero />
+      </section>
 
       {/* Our Story Section */}
-      <StorySection />
+      <section className="container mx-auto px-4 max-w-6xl">
+        <StorySection />
+      </section>
 
       {/* Our Values Section */}
-      <ValuesSection />
+      <section className="container mx-auto px-4 max-w-6xl">
+        <ValuesSection />
+      </section>
 
       {/* Team Section */}
-      <TeamSection />
+      <section className="container mx-auto px-4 max-w-6xl">
+        <TeamSection />
+      </section>
 
       {/* Contact CTA Section */}
-      <section className="container px-4">
+      <section className="container mx-auto px-4 max-w-6xl">
         <div className="rounded-xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/5 p-8 md:p-12 lg:p-16 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Get in Touch</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">

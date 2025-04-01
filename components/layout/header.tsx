@@ -79,6 +79,7 @@ export default function Header() {
   const navItems = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
+    { name: "About", href: "/about" }, // Added About page link
   ];
 
   return (
@@ -106,7 +107,7 @@ export default function Header() {
                     className="text-xl font-bold"
                     onClick={() => document.body.click()}
                   >
-                    PrimePicks
+                    NextShop
                   </Link>
                   <nav className="flex flex-col gap-4">
                     {navItems.map((item) => (
@@ -129,7 +130,7 @@ export default function Header() {
             </Sheet>
 
             <Link href="/" className="text-xl font-bold hidden md:block">
-              PrimePicks
+              NextShop
             </Link>
 
             <nav className="ml-10 hidden md:flex items-center gap-6">

@@ -1,85 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useTransition } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState, useTransition, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ProductFilters({
   categories,
+  maxProductPrice = 1000, // Default to 1000 if not provided, but accept dynamic max price
 }: {
-  categories: { id: string; name: string; slug: string }[]
+  categories: { id: string; name: string; slug: string }[];
+  maxProductPrice?: number;
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  // Round up the max price to the nearest hundred for a cleaner UI
+  const roundedMaxPrice = Math.ceil(maxProductPrice / 100) * 100;
 
   // Get current filter values from URL
-  const currentCategory = searchParams.get("category") || ""
-  const minPrice = searchParams.get("minPrice") || "0"
-  const maxPrice = searchParams.get("maxPrice") || "1000"
+  const currentCategory = searchParams.get("category") || "";
+  const minPrice = searchParams.get("minPrice") || "0";
+  const maxPrice = searchParams.get("maxPrice") || roundedMaxPrice.toString();
 
   // Local state for price range
-  const [priceRange, setPriceRange] = useState<[number, number]>([Number.parseInt(minPrice), Number.parseInt(maxPrice)])
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    Number.parseInt(minPrice),
+    Math.min(Number.parseInt(maxPrice), roundedMaxPrice),
+  ]);
+
+  // Update price range when maxProductPrice changes
+  useEffect(() => {
+    setPriceRange([
+      Number.parseInt(minPrice),
+      Math.min(Number.parseInt(maxPrice), roundedMaxPrice),
+    ]);
+  }, [maxProductPrice, minPrice, maxPrice, roundedMaxPrice]);
 
   // Apply filters
   const applyFilters = (params: Record<string, string | null>) => {
     startTransition(() => {
-      const newParams = new URLSearchParams(searchParams.toString())
+      const newParams = new URLSearchParams(searchParams.toString());
 
       // Update or remove each parameter
       Object.entries(params).forEach(([key, value]) => {
         if (value === null) {
-          newParams.delete(key)
+          newParams.delete(key);
         } else {
-          newParams.set(key, value)
+          newParams.set(key, value);
         }
-      })
+      });
 
       // Preserve search query if it exists
-      const search = searchParams.get("search")
+      const search = searchParams.get("search");
       if (search) {
-        newParams.set("search", search)
+        newParams.set("search", search);
       }
 
-      router.push(`/products?${newParams.toString()}`)
-    })
-  }
+      router.push(`/products?${newParams.toString()}`);
+    });
+  };
 
   // Handle category selection
   const handleCategoryChange = (slug: string) => {
     applyFilters({
       category: currentCategory === slug ? null : slug,
-    })
-  }
+    });
+  };
 
   // Handle price filter
   const handlePriceChange = () => {
     applyFilters({
       minPrice: priceRange[0].toString(),
       maxPrice: priceRange[1].toString(),
-    })
-  }
+    });
+  };
 
   // Reset all filters
   const resetFilters = () => {
-    setPriceRange([0, 1000])
+    setPriceRange([0, roundedMaxPrice]);
     applyFilters({
       category: null,
       minPrice: null,
       maxPrice: null,
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">Filters</h3>
-        <Button variant="ghost" size="sm" onClick={resetFilters} disabled={isPending}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={resetFilters}
+          disabled={isPending}
+        >
           Reset
         </Button>
       </div>
@@ -96,7 +122,10 @@ export default function ProductFilters({
                     checked={currentCategory === category.slug}
                     onCheckedChange={() => handleCategoryChange(category.slug)}
                   />
-                  <Label htmlFor={`category-${category.slug}`} className="text-sm font-normal cursor-pointer">
+                  <Label
+                    htmlFor={`category-${category.slug}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
                     {category.name}
                   </Label>
                 </div>
@@ -112,9 +141,11 @@ export default function ProductFilters({
               <Slider
                 value={priceRange}
                 min={0}
-                max={1000}
+                max={roundedMaxPrice}
                 step={10}
-                onValueChange={(value) => setPriceRange(value as [number, number])}
+                onValueChange={(value) =>
+                  setPriceRange(value as [number, number])
+                }
               />
 
               <div className="flex items-center justify-between">
@@ -124,7 +155,12 @@ export default function ProductFilters({
                     id="min-price"
                     type="number"
                     value={priceRange[0]}
-                    onChange={(e) => setPriceRange([Number.parseInt(e.target.value), priceRange[1]])}
+                    onChange={(e) =>
+                      setPriceRange([
+                        Number.parseInt(e.target.value),
+                        priceRange[1],
+                      ])
+                    }
                     className="w-24"
                   />
                 </div>
@@ -135,13 +171,23 @@ export default function ProductFilters({
                     id="max-price"
                     type="number"
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([
+                        priceRange[0],
+                        Number.parseInt(e.target.value),
+                      ])
+                    }
                     className="w-24"
                   />
                 </div>
               </div>
 
-              <Button onClick={handlePriceChange} size="sm" className="w-full" disabled={isPending}>
+              <Button
+                onClick={handlePriceChange}
+                size="sm"
+                className="w-full"
+                disabled={isPending}
+              >
                 Apply
               </Button>
             </div>
@@ -149,6 +195,5 @@ export default function ProductFilters({
         </AccordionItem>
       </Accordion>
     </div>
-  )
+  );
 }
-

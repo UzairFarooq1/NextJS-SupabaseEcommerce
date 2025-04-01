@@ -108,7 +108,7 @@ export default function Header() {
                     className="text-xl font-bold"
                     onClick={() => document.body.click()}
                   >
-                    NextShop
+                    Prime Picks
                   </Link>
                   <nav className="flex flex-col gap-4">
                     {navItems.map((item) => (
@@ -131,7 +131,7 @@ export default function Header() {
             </Sheet>
 
             <Link href="/" className="text-xl font-bold hidden md:block">
-              NextShop
+              Prime Picks
             </Link>
 
             <nav className="ml-10 hidden md:flex items-center gap-6">

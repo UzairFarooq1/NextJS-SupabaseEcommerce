@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
-            <h3 className="text-lg font-semibold">NextShop</h3>
+            <h3 className="text-lg font-semibold">Prime Picks</h3>
             <p className="mt-4 text-sm text-muted-foreground">
               Your modern ecommerce platform for all your shopping needs.
             </p>
@@ -105,7 +105,7 @@ export default function Footer() {
 
         <div className="mt-10 border-t pt-6">
           <p className="text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} NextShop. All rights reserved.
+            &copy; {new Date().getFullYear()} Prime Picks. All rights reserved.
           </p>
         </div>
       </div>

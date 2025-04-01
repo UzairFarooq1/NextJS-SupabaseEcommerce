@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
-            <h3 className="text-lg font-semibold">PrimePicks</h3>
+            <h3 className="text-lg font-semibold">NextShop</h3>
             <p className="mt-4 text-sm text-muted-foreground">
               Your modern ecommerce platform for all your shopping needs.
             </p>
@@ -65,8 +65,24 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold">Legal</h3>
+            <h3 className="text-sm font-semibold">Company</h3>
             <ul className="mt-4 space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/about"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Contact Us
+                </Link>
+              </li>
               <li>
                 <Link
                   href="#"
@@ -89,7 +105,7 @@ export default function Footer() {
 
         <div className="mt-10 border-t pt-6">
           <p className="text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} PrimePicks. All rights reserved.
+            &copy; {new Date().getFullYear()} NextShop. All rights reserved.
           </p>
         </div>
       </div>

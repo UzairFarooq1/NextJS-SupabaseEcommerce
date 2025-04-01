@@ -1,90 +1,92 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { getSupabaseBrowser } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { ShoppingCart, User, Menu, Search } from "lucide-react"
-import { useCart } from "@/context/cart-context"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { ShoppingCart, User, Menu, Search } from "lucide-react";
+import { useCart } from "@/context/cart-context";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { toast } = useToast()
-  const { cartCount } = useCart()
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
+  const { cartCount } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0)
-    }
+      setIsScrolled(window.scrollY > 0);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
-    const supabase = getSupabaseBrowser()
+    const supabase = getSupabaseBrowser();
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null)
-    })
+      setUser(session?.user || null);
+    });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
-    })
+      setUser(session?.user || null);
+    });
 
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseBrowser()
-    await supabase.auth.signOut()
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
     toast({
       title: "Signed out",
       description: "You have been signed out successfully.",
-    })
-    router.refresh()
-  }
+    });
+    router.refresh();
+  };
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
-  }
+  };
 
   const navItems = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
-  ]
+  ];
 
   return (
     <header
       className={`sticky top-0 z-50 w-full ${
-        isScrolled ? "border-b bg-background/80 backdrop-blur-sm" : "bg-background"
+        isScrolled
+          ? "border-b bg-background/80 backdrop-blur-sm"
+          : "bg-background"
       }`}
     >
       <div className="container mx-auto px-4">
@@ -99,8 +101,12 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="left">
                 <div className="flex flex-col gap-6 py-6">
-                  <Link href="/" className="text-xl font-bold" onClick={() => document.body.click()}>
-                    NextShop
+                  <Link
+                    href="/"
+                    className="text-xl font-bold"
+                    onClick={() => document.body.click()}
+                  >
+                    PrimePicks
                   </Link>
                   <nav className="flex flex-col gap-4">
                     {navItems.map((item) => (
@@ -108,7 +114,9 @@ export default function Header() {
                         key={item.href}
                         href={item.href}
                         className={`text-lg ${
-                          pathname === item.href ? "font-medium text-foreground" : "text-muted-foreground"
+                          pathname === item.href
+                            ? "font-medium text-foreground"
+                            : "text-muted-foreground"
                         }`}
                         onClick={() => document.body.click()}
                       >
@@ -121,7 +129,7 @@ export default function Header() {
             </Sheet>
 
             <Link href="/" className="text-xl font-bold hidden md:block">
-              NextShop
+              PrimePicks
             </Link>
 
             <nav className="ml-10 hidden md:flex items-center gap-6">
@@ -150,7 +158,12 @@ export default function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button type="submit" variant="ghost" size="icon" className="absolute right-0 top-0">
+              <Button
+                type="submit"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </form>
@@ -183,7 +196,9 @@ export default function Header() {
                     <Link href="/cart">Cart</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    Sign out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -195,6 +210,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
-

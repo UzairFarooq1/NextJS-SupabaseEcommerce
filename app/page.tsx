@@ -94,7 +94,7 @@ export default async function Home() {
                     {product.categories?.name}
                   </p>
                   <p className="font-semibold mt-2">
-                    ${product.price.toFixed(2)}
+                    Ksh{product.price.toFixed(2)}
                   </p>
                 </div>
               </Link>

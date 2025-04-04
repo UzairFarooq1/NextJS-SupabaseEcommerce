@@ -114,7 +114,7 @@ export default function OrderHistory() {
 
               <div className="flex flex-wrap justify-between items-center mt-4">
                 <p className="font-medium">
-                  ${Number(order.total_amount).toFixed(2)}
+                  Ksh{Number(order.total_amount).toFixed(2)}
                 </p>
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/profile/orders/${order.id}`}>View Details</Link>

@@ -39,6 +39,7 @@ export interface Database {
           slug: string
           description: string | null
           created_at: string
+          image_url: string | null
         }
         Insert: {
           id?: string
@@ -46,6 +47,7 @@ export interface Database {
           slug: string
           description?: string | null
           created_at?: string
+          image_url?: string | null
         }
         Update: {
           id?: string
@@ -53,11 +55,12 @@ export interface Database {
           slug?: string
           description?: string | null
           created_at?: string
+          image_url?: string | null
         }
       }
       products: {
         Row: {
-          id: string
+          id: number
           name: string
           slug: string
           description: string | null
@@ -69,7 +72,7 @@ export interface Database {
           updated_at: string
         }
         Insert: {
-          id?: string
+          id?: number
           name: string
           slug: string
           description?: string | null
@@ -81,7 +84,7 @@ export interface Database {
           updated_at?: string
         }
         Update: {
-          id?: string
+          id?: number
           name?: string
           slug?: string
           description?: string | null
@@ -117,6 +120,73 @@ export interface Database {
           quantity?: number
           created_at?: string
           updated_at?: string
+        }
+      }
+      orders: {
+        Row: {
+          id: string
+          user_id: string
+          status: string
+          total_amount: number
+          shipping_address: string
+          payment_method: string
+          payment_status: string
+          tracking_number: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          status?: string
+          total_amount: number
+          shipping_address: string
+          payment_method: string
+          payment_status?: string
+          tracking_number?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          status?: string
+          total_amount?: number
+          shipping_address?: string
+          payment_method?: string
+          payment_status?: string
+          tracking_number?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: number
+          quantity: number
+          price_at_purchase: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id: number
+          quantity: number
+          price_at_purchase: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_id?: number
+          quantity?: number
+          price_at_purchase?: number
+          created_at?: string
         }
       }
     }

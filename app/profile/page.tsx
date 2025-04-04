@@ -1,26 +1,30 @@
-import { getSupabaseServer } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import ProfileForm from "@/components/profile/profile-form"
-import { Separator } from "@/components/ui/separator"
-import OrderHistory from "@/components/profile/order-history"
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import ProfileForm from "@/components/profile/profile-form";
+import { Separator } from "@/components/ui/separator";
+import OrderHistory from "@/components/profile/order-history";
 
 export default async function ProfilePage() {
-  const supabase = getSupabaseServer()
+  const supabase = getSupabaseServer();
 
   // Check if user is authenticated
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/auth/signin?redirect=/profile")
+    redirect("/auth/signin?redirect=/profile");
   }
 
   // Fetch user profile
-  const { data: profile } = await supabase.from("users").select("*").eq("id", session.user.id).single()
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", session.user.id)
+    .single();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -28,7 +32,9 @@ export default async function ProfilePage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold">Personal Information</h2>
-              <p className="text-muted-foreground">Update your personal details and address</p>
+              <p className="text-muted-foreground">
+                Update your personal details and address
+              </p>
             </div>
 
             <Separator />
@@ -38,17 +44,9 @@ export default async function ProfilePage() {
         </div>
 
         <div className="space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold">Account</h2>
-            <p className="text-muted-foreground">Manage your account settings</p>
-          </div>
-
-          <Separator />
-
           <OrderHistory />
         </div>
       </div>
     </div>
-  )
+  );
 }
-

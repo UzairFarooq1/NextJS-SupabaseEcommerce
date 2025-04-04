@@ -23,7 +23,13 @@ import { useCart } from "@/context/cart-context";
 import MpesaPayment from "./mpesa-payment";
 import PaypalPayment from "./paypal-payment";
 
-export default function CheckoutForm({ profile }: { profile: any }) {
+export default function CheckoutForm({
+  profile,
+  cartItems,
+}: {
+  profile: any;
+  cartItems: any[];
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const { refreshCart } = useCart();
@@ -74,9 +80,10 @@ export default function CheckoutForm({ profile }: { profile: any }) {
     setIsProcessing(true);
 
     try {
+      const supabase = getSupabaseBrowser();
+
       // If user chose to save info, update their profile
       if (formData.saveInfo) {
-        const supabase = getSupabaseBrowser();
         await supabase
           .from("users")
           .update({
@@ -87,17 +94,68 @@ export default function CheckoutForm({ profile }: { profile: any }) {
           .eq("id", profile.id);
       }
 
+      // Calculate order total
+      const subtotal = cartItems.reduce((total, item) => {
+        return total + item.products.price * item.quantity;
+      }, 0);
+
+      const shipping = subtotal >= 100 ? 0 : 10;
+      const tax = subtotal * 0.1;
+      const total = subtotal + shipping + tax;
+
+      // Create full shipping address
+      const shippingAddress = `${formData.fullName}\n${formData.address}\n${formData.city}, ${formData.postalCode}\n${formData.country}\nPhone: ${formData.phone}`;
+
+      // Create order record
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          user_id: profile.id,
+          status: "pending",
+          total_amount: total,
+          shipping_address: shippingAddress,
+          payment_method: paymentMethod,
+          payment_status: "pending",
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Create order items
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.products.id,
+        quantity: item.quantity,
+        price_at_purchase: item.products.price,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
       // Process payment based on selected method
       // This would be handled by the payment components
 
       // For demo purposes, we'll simulate a successful payment
-      setTimeout(() => {
-        // Clear cart
-        clearCart();
+      await supabase
+        .from("orders")
+        .update({
+          status: "processing",
+          payment_status: "paid",
+        })
+        .eq("id", order.id);
 
-        // Redirect to success page
-        router.push("/checkout/success");
-      }, 2000);
+      // Clear cart
+      await supabase.from("cart_items").delete().eq("user_id", profile.id);
+
+      // Refresh cart
+      refreshCart();
+
+      // Redirect to success page
+      router.push(`/checkout/success?orderId=${order.id}`);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -105,16 +163,6 @@ export default function CheckoutForm({ profile }: { profile: any }) {
         variant: "destructive",
       });
       setIsProcessing(false);
-    }
-  };
-
-  const clearCart = async () => {
-    try {
-      const supabase = getSupabaseBrowser();
-      await supabase.from("cart_items").delete().eq("user_id", profile.id);
-      refreshCart();
-    } catch (error) {
-      console.error("Failed to clear cart:", error);
     }
   };
 

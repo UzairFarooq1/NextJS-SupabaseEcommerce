@@ -8,11 +8,17 @@ export const metadata: Metadata = {
   description: "Your order has been successfully placed",
 };
 
-export default function CheckoutSuccessPage() {
-  // Generate a random order number
-  const orderNumber = `ORD-${Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0")}`;
+export default function CheckoutSuccessPage({
+  searchParams,
+}: {
+  searchParams: { orderId?: string };
+}) {
+  // Use the order ID from the URL or generate a random one
+  const orderNumber =
+    searchParams.orderId ||
+    `ORD-${Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0")}`;
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-3xl text-center">

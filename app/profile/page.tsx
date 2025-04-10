@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ProfileForm from "@/components/profile/profile-form";

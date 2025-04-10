@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import CartItems from "@/components/cart/cart-items";

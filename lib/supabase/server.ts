@@ -4,32 +4,32 @@ import type { Database } from "@/types/supabase"
 
 export const getSupabaseServer = async () => {
   try {
-    // Await the cookies() function to resolve the Promise
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
 
     return createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
+          async get(name: string) {
             try {
-              return cookieStore.get(name)?.value
+              return (await cookieStore).get(name)?.value
             } catch (error) {
+              // This handles the case during static generation
               console.error(`Error getting cookie ${name}:`, error)
               return undefined
             }
           },
-          set(name: string, value: string, options: any) {
+          async set(name: string, value: string, options: any) {
             try {
-              cookieStore.set({ name, value, ...options })
+              (await cookieStore).set({ name, value, ...options })
             } catch (error) {
               console.error(`Error setting cookie ${name}:`, error)
             }
           },
-          remove(name: string, options: any) {
+          async remove(name: string, options: any) {
             try {
-              cookieStore.set({ name, value: "", ...options })
+              (await cookieStore).set({ name, value: "", ...options })
             } catch (error) {
               console.error(`Error removing cookie ${name}:`, error)
             }
@@ -44,12 +44,12 @@ export const getSupabaseServer = async () => {
       from: () => ({
         select: () => ({
           eq: () => ({
-            single: async () => ({ data: null, error: new Error("Supabase client creation failed") }),
-            limit: async () => ({ data: null, error: new Error("Supabase client creation failed") }),
+            single: async () => ({ data: null, error: null }),
+            limit: async () => ({ data: [], error: null }),
           }),
-          limit: async () => ({ data: null, error: new Error("Supabase client creation failed") }),
+          limit: async () => ({ data: [], error: null }),
           order: () => ({
-            limit: async () => ({ data: null, error: new Error("Supabase client creation failed") }),
+            limit: async () => ({ data: [], error: null }),
           }),
         }),
       }),

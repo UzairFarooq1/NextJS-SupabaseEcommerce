@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 
 export default async function OrdersPage() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Check if user is authenticated
   const {
@@ -59,7 +61,7 @@ export default async function OrdersPage() {
 
       {orders && orders.length > 0 ? (
         <div className="space-y-6">
-          {orders.map((order) => (
+          {orders.map((order: any) => (
             <Card key={order.id}>
               <CardHeader className="pb-2">
                 <div className="flex flex-wrap justify-between items-center">

@@ -1,4 +1,5 @@
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/utils/auth";
 import {
   Card,
   CardContent,
@@ -20,12 +21,21 @@ import SalesChart from "@/components/admin/sales-chart";
 import TopSellingProducts from "@/components/admin/top-selling-products";
 
 export default async function AdminDashboard() {
-  const supabase = getSupabaseServer();
+  // Ensure user is admin
+  const adminUser = await requireAdmin();
+
+  const supabase = await getSupabaseServer();
+
+  // Debug: Log the current user
+  console.log("Admin user:", adminUser);
 
   // Fetch statistics
-  const { data: orderStats } = await supabase
+  const { data: orderStats, error: orderStatsError } = await supabase
     .from("orders")
     .select("id, total_amount, status, created_at");
+
+  // Debug: Log order stats query result
+  console.log("Order stats query result:", { orderStats, orderStatsError });
 
   // Use the correct type for count queries
   const { data: productData, count: productCount } = await supabase
@@ -39,30 +49,49 @@ export default async function AdminDashboard() {
   // Calculate statistics
   const totalOrders = orderStats?.length || 0;
   const totalRevenue =
-    orderStats?.reduce((sum, order) => sum + Number(order.total_amount), 0) ||
-    0;
+    orderStats?.reduce(
+      (sum: number, order: { total_amount: any }) =>
+        sum + Number(order.total_amount),
+      0
+    ) || 0;
   const pendingOrders =
-    orderStats?.filter((order) => order.status === "pending").length || 0;
+    orderStats?.filter(
+      (order: { status: string }) => order.status === "pending"
+    ).length || 0;
 
-  // Get recent orders
-  const { data: recentOrders } = await supabase
+  // Get recent orders with user details - try a simpler query first
+  const { data: recentOrders, error: recentOrdersError } = await supabase
     .from("orders")
-    .select(
-      `
-      id,
-      user_id,
-      total_amount,
-      status,
-      payment_method,
-      created_at,
-      users (
-        full_name,
-        email
-      )
-    `
-    )
+    .select("*")
     .order("created_at", { ascending: false })
     .limit(5);
+
+  // Debug: Log recent orders query result
+  console.log("Recent orders query result:", {
+    recentOrders,
+    recentOrdersError,
+  });
+
+  // If we got orders, now try to get user details
+  const ordersWithUsers = [];
+  if (recentOrders && recentOrders.length > 0) {
+    // Get user details for each order
+    for (const order of recentOrders) {
+      const { data: userData } = await supabase
+        .from("users")
+        .select("full_name, email")
+        .eq("id", order.user_id)
+        .single();
+
+      ordersWithUsers.push({
+        ...order,
+        users: userData,
+      });
+    }
+  }
+
+  // Debug: Log orders with users
+  console.log("Orders with users:", ordersWithUsers);
 
   // Get top selling products
   const { data: topProducts } = await supabase
@@ -97,7 +126,9 @@ export default async function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">
+              Ksh {totalRevenue.toFixed(2)}
+            </div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500 inline-flex items-center">
                 +12.5% <ArrowUpRight className="h-3 w-3 ml-1" />
@@ -156,6 +187,18 @@ export default async function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Display any errors */}
+      {(orderStatsError || recentOrdersError) && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-md">
+          {orderStatsError && (
+            <p>Error fetching order stats: {orderStatsError.message}</p>
+          )}
+          {recentOrdersError && (
+            <p>Error fetching recent orders: {recentOrdersError.message}</p>
+          )}
+        </div>
+      )}
+
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -196,7 +239,13 @@ export default async function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <RecentOrdersTable orders={recentOrders || []} />
+              <RecentOrdersTable
+                orders={
+                  ordersWithUsers.length > 0
+                    ? ordersWithUsers
+                    : recentOrders || []
+                }
+              />
             </CardContent>
           </Card>
         </TabsContent>

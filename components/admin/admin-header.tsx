@@ -15,16 +15,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { signOut } from "@/lib/actions/auth-actions";
 
 export default function AdminHeader({ user }: { user: any }) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseBrowser();
-    await supabase.auth.signOut();
-    router.push("/auth/signin");
+    await signOut();
   };
 
   return (

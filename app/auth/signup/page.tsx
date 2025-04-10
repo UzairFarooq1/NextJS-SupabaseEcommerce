@@ -5,7 +5,6 @@ import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { signUp } from "@/lib/actions/auth-actions";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -41,28 +41,23 @@ export default function SignUpPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Update the handleSubmit function to include the new fields
+  // Update the handleSubmit function to use the server action
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
 
     try {
-      const supabase = getSupabaseBrowser();
+      const formDataObj = new FormData();
+      formDataObj.append("email", formData.email);
+      formDataObj.append("password", formData.password);
+      formDataObj.append("fullName", formData.fullName);
+      formDataObj.append("address", formData.address);
+      formDataObj.append("phone", formData.phone);
 
-      const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            address: formData.address,
-            phone: formData.phone,
-          },
-        },
-      });
+      const result = await signUp(formDataObj);
 
-      if (error) {
-        throw error;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       toast({
@@ -132,7 +127,7 @@ export default function SignUpPage() {
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="+254 123 456789"
+                placeholder="+1 (555) 123-4567"
                 value={formData.phone}
                 onChange={handleChange}
               />

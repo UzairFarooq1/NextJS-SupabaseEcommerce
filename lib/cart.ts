@@ -1,7 +1,7 @@
 import { getSupabaseServer } from "@/lib/supabase/server"
 
 export async function getUserCartItems() {
-  const supabase = getSupabaseServer()
+  const supabase = await getSupabaseServer()
 
   // Check if user is authenticated
   const {

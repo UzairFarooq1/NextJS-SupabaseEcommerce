@@ -19,7 +19,7 @@ export default async function CustomersPage({
 }: {
   searchParams: { page?: string; search?: string };
 }) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   const page = Number(searchParams.page) || 1;
   const pageSize = 10;
@@ -42,6 +42,41 @@ export default async function CustomersPage({
     .order("created_at", { ascending: false })
     .range(from, to);
 
+  // Fetch order data for all customers in one query
+  const customerIds = customers?.map((customer: any) => customer.id) || [];
+
+  // Get order counts and total spent for each customer
+  const { data: customerOrders } =
+    customerIds.length > 0
+      ? await supabase
+          .from("orders")
+          .select("user_id, total_amount")
+          .in("user_id", customerIds)
+      : { data: [] };
+
+  // Create a map of customer stats
+  const customerStats: Record<
+    string,
+    { orderCount: number; totalSpent: number }
+  > = {};
+
+  // Initialize stats for all customers
+  if (customers) {
+    customers.forEach((customer: any) => {
+      customerStats[customer.id] = { orderCount: 0, totalSpent: 0 };
+    });
+  }
+
+  // Update stats with actual order data
+  if (customerOrders) {
+    customerOrders.forEach((order: any) => {
+      if (customerStats[order.user_id]) {
+        customerStats[order.user_id].orderCount++;
+        customerStats[order.user_id].totalSpent += Number(order.total_amount);
+      }
+    });
+  }
+
   const totalPages = count ? Math.ceil(count / pageSize) : 0;
 
   return (
@@ -51,18 +86,23 @@ export default async function CustomersPage({
         <p className="text-muted-foreground">Manage your customer accounts</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <form
+        className="flex flex-col sm:flex-row gap-4 items-end"
+        action="/admin/customers"
+        method="GET"
+      >
         <div className="grid w-full sm:max-w-sm items-center gap-1.5">
           <Label htmlFor="search">Search</Label>
           <Input
             id="search"
+            name="search"
             placeholder="Search by name or email..."
             defaultValue={search}
           />
         </div>
 
         <Button type="submit">Search</Button>
-      </div>
+      </form>
 
       <div className="rounded-md border">
         <Table>
@@ -78,7 +118,7 @@ export default async function CustomersPage({
           </TableHeader>
           <TableBody>
             {customers && customers.length > 0 ? (
-              customers.map((customer) => (
+              customers.map((customer: any) => (
                 <TableRow key={customer.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -106,17 +146,22 @@ export default async function CustomersPage({
                     {format(new Date(customer.created_at), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
-                    {/* This would be populated from a join or separate query */}
-                    <Link
-                      href={`/admin/orders?customer=${customer.id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      View Orders
-                    </Link>
+                    {customerStats[customer.id]?.orderCount > 0 ? (
+                      <Link
+                        href={`/admin/orders?customer=${customer.id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {customerStats[customer.id].orderCount}{" "}
+                        {customerStats[customer.id].orderCount === 1
+                          ? "Order"
+                          : "Orders"}
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">No orders</span>
+                    )}
                   </TableCell>
                   <TableCell>
-                    {/* This would be populated from a join or separate query */}
-                    $0.00
+                    ${customerStats[customer.id]?.totalSpent.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="ghost" size="sm">

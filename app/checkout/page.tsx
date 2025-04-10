@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CheckoutPage() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Check if user is authenticated
   const {

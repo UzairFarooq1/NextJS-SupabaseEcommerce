@@ -8,7 +8,7 @@ export default async function ProductPage({
 }: {
   params: { slug: string };
 }) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Fetch product details
   const { data: product } = await supabase
@@ -90,7 +90,7 @@ export default async function ProductPage({
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6">Related Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((relatedProduct) => (
+            {relatedProducts.map((relatedProduct: any) => (
               <a
                 key={relatedProduct.id}
                 href={`/products/Ksh{relatedProduct.slug}`}

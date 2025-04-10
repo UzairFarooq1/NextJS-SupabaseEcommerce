@@ -112,10 +112,10 @@ export default function SalesChart() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `Ksh ${value}`}
         />
         <Tooltip
-          formatter={(value: number) => [`$${value}`, "Revenue"]}
+          formatter={(value: number) => [`Ksh ${value}`, "Revenue"]}
           labelFormatter={(label) => format(new Date(label), "MMMM d, yyyy")}
         />
         <Line

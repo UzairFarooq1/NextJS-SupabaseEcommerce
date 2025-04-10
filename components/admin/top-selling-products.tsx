@@ -50,7 +50,7 @@ export default function TopSellingProducts({ products }: { products: any[] }) {
                 </Link>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-sm text-muted-foreground">
-                    ${Number(product.price).toFixed(2)}
+                    Ksh {Number(product.price).toFixed(2)}
                   </span>
                   <span className="text-sm font-medium">
                     {item.quantity} sold

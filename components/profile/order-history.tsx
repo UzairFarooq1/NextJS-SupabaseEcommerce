@@ -18,22 +18,37 @@ import { Loader2 } from "lucide-react";
 export default function OrderHistory() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const supabase = getSupabaseBrowser();
 
+        // Get the current user session
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          setError("You must be logged in to view your orders");
+          setIsLoading(false);
+          return;
+        }
+
+        // Get orders for the current user only
         const { data: orders, error } = await supabase
           .from("orders")
           .select("*")
+          .eq("user_id", session.user.id) // Filter by the current user's ID
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
         setOrders(orders || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching orders:", error);
+        setError(error.message || "Failed to load orders");
       } finally {
         setIsLoading(false);
       }
@@ -64,6 +79,22 @@ export default function OrderHistory() {
       <div className="flex justify-center items-center py-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Order History</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-6">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button asChild>
+            <Link href="/auth/signin">Sign In</Link>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 

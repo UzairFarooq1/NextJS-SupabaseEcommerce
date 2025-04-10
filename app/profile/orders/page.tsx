@@ -19,7 +19,7 @@ export default async function OrdersPage() {
     redirect("/auth/signin?redirect=/profile/orders");
   }
 
-  // Fetch orders
+  // Fetch orders for the current user only
   const { data: orders } = await supabase
     .from("orders")
     .select("*")
@@ -82,7 +82,7 @@ export default async function OrdersPage() {
                       Total Amount
                     </p>
                     <p className="font-medium">
-                      ${Number(order.total_amount).toFixed(2)}
+                      Ksh{Number(order.total_amount).toFixed(2)}
                     </p>
                   </div>
                   <div>

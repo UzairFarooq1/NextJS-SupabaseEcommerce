@@ -15,7 +15,7 @@ export default async function ProductsPage({
     search?: string;
   };
 }) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Fetch categories for filter
   const { data: categories } = await supabase
@@ -26,10 +26,16 @@ export default async function ProductsPage({
   const cartItems = await getUserCartItems();
 
   // Create a map of product_id to quantity for easy lookup
-  const cartItemsMap = cartItems.reduce((acc, item) => {
-    acc[item.product_id] = item.quantity;
-    return acc;
-  }, {} as Record<string, number>);
+  const cartItemsMap = cartItems.reduce(
+    (
+      acc: { [x: string]: any },
+      item: { product_id: string | number; quantity: any }
+    ) => {
+      acc[item.product_id] = item.quantity;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Build query with filters
   let query = supabase.from("products").select("*, categories(name, slug)");
@@ -67,7 +73,9 @@ export default async function ProductsPage({
   // Get the maximum price from the current product set
   const maxPrice =
     products && products.length > 0
-      ? Math.max(...products.map((product) => Number(product.price)))
+      ? Math.max(
+          ...products.map((product: { price: any }) => Number(product.price))
+        )
       : 1000; // Default to 1000 if no products or prices
 
   return (
@@ -88,7 +96,7 @@ export default async function ProductsPage({
           <Suspense fallback={<div>Loading products...</div>}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
               {products?.length ? (
-                products.map((product) => (
+                products.map((product: any) => (
                   <ProductCard
                     key={product.id}
                     product={product}

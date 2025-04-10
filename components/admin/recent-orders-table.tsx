@@ -31,6 +31,37 @@ export default function RecentOrdersTable({ orders }: { orders: any[] }) {
     }
   };
 
+  // Check if orders is undefined or not an array
+  if (!orders || !Array.isArray(orders)) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Payment</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell
+                colSpan={7}
+                className="text-center py-6 text-muted-foreground"
+              >
+                Error loading orders data
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -71,7 +102,9 @@ export default function RecentOrdersTable({ orders }: { orders: any[] }) {
                       order.status.slice(1)}
                   </Badge>
                 </TableCell>
-                <TableCell>${Number(order.total_amount).toFixed(2)}</TableCell>
+                <TableCell>
+                  Ksh{Number(order.total_amount).toFixed(2)}
+                </TableCell>
                 <TableCell className="capitalize">
                   {order.payment_method}
                 </TableCell>

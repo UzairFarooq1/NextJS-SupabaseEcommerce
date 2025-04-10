@@ -1,4 +1,5 @@
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/utils/auth";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -24,9 +25,17 @@ import {
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string; status?: string };
+  searchParams: {
+    page?: string;
+    search?: string;
+    status?: string;
+    customer?: string;
+  };
 }) {
-  const supabase = getSupabaseServer();
+  // Ensure user is admin
+  await requireAdmin();
+
+  const supabase = await getSupabaseServer();
 
   const page = Number(searchParams.page) || 1;
   const pageSize = 10;
@@ -34,17 +43,9 @@ export default async function OrdersPage({
   const statusFilter = searchParams.status || "";
 
   // Build query
-  let query = supabase.from("orders").select(
-    `
-      *,
-      users (
-        id,
-        full_name,
-        email
-      )
-    `,
-    { count: "exact" }
-  );
+  let query = supabase
+    .from("orders")
+    .select("*, users(id, full_name, email)", { count: "exact" });
 
   // Apply filters
   if (search) {
@@ -57,14 +58,25 @@ export default async function OrdersPage({
     query = query.eq("status", statusFilter);
   }
 
+  // Check for customer filter
+  const customerFilter = searchParams.customer || "";
+  console.log("Applying customer filter:", customerFilter);
+  if (customerFilter) {
+    query = query.eq("user_id", customerFilter);
+  }
+
   // Pagination
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
   // Execute query
-  const { data: orders, count } = await query
-    .order("created_at", { ascending: false })
-    .range(from, to);
+  const {
+    data: orders,
+    count,
+    error,
+  } = await query.order("created_at", { ascending: false }).range(from, to);
+
+  console.log("Orders query result:", { orders, count, error }); // Debug log
 
   const totalPages = count ? Math.ceil(count / pageSize) : 0;
 
@@ -123,6 +135,12 @@ export default async function OrdersPage({
         <Button type="submit">Filter</Button>
       </div>
 
+      {error && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-md">
+          Error loading orders: {error.message}
+        </div>
+      )}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -138,7 +156,7 @@ export default async function OrdersPage({
           </TableHeader>
           <TableBody>
             {orders && orders.length > 0 ? (
-              orders.map((order) => (
+              orders.map((order: any) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">
                     #{order.id.substring(0, 8)}
@@ -159,7 +177,7 @@ export default async function OrdersPage({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    ${Number(order.total_amount).toFixed(2)}
+                    Ksh{Number(order.total_amount).toFixed(2)}
                   </TableCell>
                   <TableCell className="capitalize">
                     <div>{order.payment_method}</div>

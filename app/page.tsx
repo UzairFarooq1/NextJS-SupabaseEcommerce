@@ -5,7 +5,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 import HeroCarousel from "@/components/hero-carousel";
 
 export default async function Home() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Fetch featured products
   const { data: featuredProducts } = await supabase
@@ -34,7 +34,7 @@ export default async function Home() {
             Shop by Category
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {categories?.map((category) => (
+            {categories?.map((category: any) => (
               <Link
                 key={category.id}
                 href={`/products?category=${category.slug}`}
@@ -70,7 +70,7 @@ export default async function Home() {
             Featured Products
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {featuredProducts?.map((product) => (
+            {featuredProducts?.map((product: any) => (
               <Link
                 key={product.id}
                 href={`/products/${product.slug}`}

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import { ShoppingCart, User, Menu, Search } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
+import { signOut } from "@/lib/actions/auth-actions";
 
 export default function Header() {
   const pathname = usePathname();
@@ -60,13 +60,7 @@ export default function Header() {
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseBrowser();
-    await supabase.auth.signOut();
-    toast({
-      title: "Signed out",
-      description: "You have been signed out successfully.",
-    });
-    router.refresh();
+    await signOut();
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -108,7 +102,7 @@ export default function Header() {
                     className="text-xl font-bold"
                     onClick={() => document.body.click()}
                   >
-                    Prime Picks
+                    NextShop
                   </Link>
                   <nav className="flex flex-col gap-4">
                     {navItems.map((item) => (
@@ -131,7 +125,7 @@ export default function Header() {
             </Sheet>
 
             <Link href="/" className="text-xl font-bold hidden md:block">
-              Prime Picks
+              NextShop
             </Link>
 
             <nav className="ml-10 hidden md:flex items-center gap-6">

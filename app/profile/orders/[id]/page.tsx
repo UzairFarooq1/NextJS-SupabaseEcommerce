@@ -14,7 +14,7 @@ export default async function OrderDetailsPage({
 }: {
   params: { id: string };
 }) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Check if user is authenticated
   const {
@@ -25,12 +25,12 @@ export default async function OrderDetailsPage({
     redirect("/auth/signin?redirect=/profile/orders/" + params.id);
   }
 
-  // Fetch order details
+  // Fetch order details and ensure it belongs to the current user
   const { data: order } = await supabase
     .from("orders")
     .select("*")
     .eq("id", params.id)
-    .eq("user_id", session.user.id)
+    .eq("user_id", session.user.id) // Important: Only allow access to the user's own orders
     .single();
 
   if (!order) {
@@ -151,7 +151,7 @@ export default async function OrderDetailsPage({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {orderItems.map((item) => (
+                {orderItems.map((item: any) => (
                   <div key={item.id} className="flex gap-4">
                     <div className="w-16 h-16 relative rounded-md overflow-hidden bg-muted flex-shrink-0">
                       {item.products.image_url ? (
@@ -182,13 +182,13 @@ export default async function OrderDetailsPage({
                         Qty: {item.quantity}
                       </p>
                       <p className="font-medium mt-1">
-                        ${Number(item.price_at_purchase).toFixed(2)}
+                        Ksh{Number(item.price_at_purchase).toFixed(2)}
                       </p>
                     </div>
 
                     <div className="text-right">
                       <p className="font-medium">
-                        $
+                        Ksh
                         {(
                           Number(item.price_at_purchase) * item.quantity
                         ).toFixed(2)}
@@ -209,19 +209,19 @@ export default async function OrderDetailsPage({
             <CardContent className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${(Number(order.total_amount) * 0.9).toFixed(2)}</span>
+                <span>Ksh{(Number(order.total_amount) * 0.9).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax</span>
-                <span>${(Number(order.total_amount) * 0.1).toFixed(2)}</span>
+                <span>Ksh{(Number(order.total_amount) * 0.1).toFixed(2)}</span>
               </div>
 
               <Separator />
 
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${Number(order.total_amount).toFixed(2)}</span>
+                <span>Ksh{Number(order.total_amount).toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>

@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import OrderHistory from "@/components/profile/order-history";
 
 export default async function ProfilePage() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   // Check if user is authenticated
   const {

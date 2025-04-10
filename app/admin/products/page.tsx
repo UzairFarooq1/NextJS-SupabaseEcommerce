@@ -27,7 +27,7 @@ export default async function ProductsPage({
 }: {
   searchParams: { page?: string; search?: string; category?: string };
 }) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
 
   const page = Number(searchParams.page) || 1;
   const pageSize = 10;
@@ -97,7 +97,7 @@ export default async function ProductsPage({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {categories?.map((category) => (
+              {categories?.map((category: any) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
                 </SelectItem>
@@ -123,7 +123,7 @@ export default async function ProductsPage({
           </TableHeader>
           <TableBody>
             {products && products.length > 0 ? (
-              products.map((product) => (
+              products.map((product: any) => (
                 <TableRow key={product.id}>
                   <TableCell>
                     <div className="h-10 w-10 relative rounded-md overflow-hidden bg-muted">

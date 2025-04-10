@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
-import AddToCartButton from "@/components/add-to-cart-button";
+import Image from "next/image";
+import AddToCartButton from "@/components/cart/add-to-cart-button";
 
 export default async function ProductPage({
   params,
@@ -30,7 +30,7 @@ export default async function ProductPage({
     .limit(4);
 
   return (
-    <div className="container py-8">
+    <div className="container mx-auto px-4 py-12 max-w-6xl">
       <div className="grid md:grid-cols-2 gap-8 mb-12">
         <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
           <Image
@@ -69,7 +69,7 @@ export default async function ProductPage({
 
           <div className="mt-8">
             <div className="flex items-center gap-4">
-              <AddToCartButton productId={product.id} />
+              <AddToCartButton product={product.id} />
             </div>
           </div>
 
@@ -93,14 +93,15 @@ export default async function ProductPage({
             {relatedProducts.map((relatedProduct: any) => (
               <a
                 key={relatedProduct.id}
-                href={`/products/Ksh{relatedProduct.slug}`}
+                href={`/products/${relatedProduct.slug}`}
                 className="group overflow-hidden rounded-lg border border-border p-3 hover:border-primary/50"
               >
                 <div className="aspect-square w-full relative mb-3 bg-muted rounded-md overflow-hidden">
                   <Image
                     src={
                       relatedProduct.image_url ||
-                      "/placeholder.svg?height=300&width=300"
+                      "/placeholder.svg?height=300&width=300" ||
+                      "/placeholder.svg"
                     }
                     alt={relatedProduct.name}
                     className="object-cover transition-transform group-hover:scale-105"

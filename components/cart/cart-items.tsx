@@ -26,30 +26,6 @@ export default function CartItems({ items: initialItems }: { items: any[] }) {
     try {
       const supabase = getSupabaseBrowser();
 
-      // Find the current item
-      const currentItem = items.find((item) => item.id === itemId);
-      if (!currentItem) throw new Error("Item not found");
-
-      // Get the latest stock information
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock_quantity")
-        .eq("id", currentItem.products.id)
-        .single();
-
-      if (!product) throw new Error("Product not found");
-
-      // Check if requested quantity exceeds available stock
-      if (quantity > product.stock_quantity) {
-        toast({
-          title: "Stock limit reached",
-          description: `Cannot add more of this item. Only ${product.stock_quantity} available.`,
-          variant: "destructive",
-        });
-        setIsUpdating((prev) => ({ ...prev, [itemId]: false }));
-        return;
-      }
-
       await supabase.from("cart_items").update({ quantity }).eq("id", itemId);
 
       // Update local state immediately
@@ -143,7 +119,7 @@ export default function CartItems({ items: initialItems }: { items: any[] }) {
               </Link>
 
               <p className="text-sm text-muted-foreground mt-1">
-                ${item.products.price.toFixed(2)}
+                Ksh{item.products.price.toFixed(2)}
               </p>
 
               <div className="flex items-center gap-2 mt-auto">
@@ -191,7 +167,7 @@ export default function CartItems({ items: initialItems }: { items: any[] }) {
               </Button>
 
               <p className="font-medium">
-                ${(item.products.price * item.quantity).toFixed(2)}
+                Ksh{(item.products.price * item.quantity).toFixed(2)}
               </p>
             </div>
           </div>

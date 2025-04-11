@@ -23,6 +23,12 @@ import { useCart } from "@/context/cart-context";
 import MpesaPayment from "./mpesa-payment";
 import PaypalPayment from "./paypal-payment";
 
+// Import the stock actions at the top of the file
+import {
+  checkStockAvailability,
+  reduceStockQuantities,
+} from "@/lib/actions/stock-actions";
+
 export default function CheckoutForm({
   profile,
   cartItems,
@@ -59,6 +65,9 @@ export default function CheckoutForm({
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
+  // Update the handleSubmit function to check stock before processing the order
+  // Find the handleSubmit function and modify it to include stock checks:
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -81,6 +90,19 @@ export default function CheckoutForm({
 
     try {
       const supabase = getSupabaseBrowser();
+
+      // Check stock availability before proceeding
+      try {
+        await checkStockAvailability(cartItems);
+      } catch (error: any) {
+        toast({
+          title: "Stock issue",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
 
       // If user chose to save info, update their profile
       if (formData.saveInfo) {
@@ -147,6 +169,9 @@ export default function CheckoutForm({
           payment_status: "paid",
         })
         .eq("id", order.id);
+
+      // Reduce stock quantities
+      await reduceStockQuantities(orderItems);
 
       // Clear cart
       await supabase.from("cart_items").delete().eq("user_id", profile.id);

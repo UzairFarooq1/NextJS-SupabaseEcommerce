@@ -31,6 +31,8 @@ export default function AddToCartButton({
   const isInStock = product.stock_quantity > 0;
   const isDisabled = disabled || !isInStock || isLoading;
 
+  // Update the handleAddToCart function to check stock before adding to cart
+
   const handleAddToCart = async () => {
     // Don't proceed if the product is out of stock
     if (!isInStock) {
@@ -58,6 +60,23 @@ export default function AddToCartButton({
         return;
       }
 
+      // Get the latest stock information
+      const { data: currentProduct } = await supabase
+        .from("products")
+        .select("stock_quantity")
+        .eq("id", product.id)
+        .single();
+
+      if (!currentProduct || currentProduct.stock_quantity <= 0) {
+        toast({
+          title: "Out of stock",
+          description: `${product.name} is currently out of stock.`,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Check if product is already in cart
       const { data: existingItem } = await supabase
         .from("cart_items")
@@ -65,6 +84,20 @@ export default function AddToCartButton({
         .eq("user_id", session.user.id)
         .eq("product_id", product.id)
         .single();
+
+      // Check if adding more would exceed available stock
+      if (
+        existingItem &&
+        existingItem.quantity + 1 > currentProduct.stock_quantity
+      ) {
+        toast({
+          title: "Stock limit reached",
+          description: `Cannot add more of this item. Only ${currentProduct.stock_quantity} available.`,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
       if (existingItem) {
         // Update quantity if already in cart

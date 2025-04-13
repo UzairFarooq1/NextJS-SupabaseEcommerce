@@ -99,7 +99,7 @@ export default async function ProductPage({
             </div>
           </div>
 
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <h3 className="text-lg font-semibold mb-2">Product Details</h3>
             <ul className="list-disc list-inside text-muted-foreground">
               <li>
@@ -111,7 +111,7 @@ export default async function ProductPage({
                 {product.id ? String(product.id).substring(0, 8) : "N/A"}
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -22,6 +22,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useCart } from "@/context/cart-context";
 import MpesaPayment from "./mpesa-payment";
 import PaypalPayment from "./paypal-payment";
+import { processOrder } from "@/lib/actions/checkout-actions";
 
 export default function CheckoutForm({
   profile,
@@ -80,7 +81,54 @@ export default function CheckoutForm({
     setIsProcessing(true);
 
     try {
-      const supabase = getSupabaseBrowser();
+      const supabase = await getSupabaseBrowser();
+
+      // Check stock availability before proceeding
+      const stockIssues = [];
+
+      for (const item of cartItems) {
+        // Get the latest stock information
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock_quantity, name")
+          .eq("id", item.products.id)
+          .single();
+
+        if (!product) {
+          stockIssues.push(
+            `Product "${item.products.name}" is no longer available.`
+          );
+          continue;
+        }
+
+        if (product.stock_quantity < item.quantity) {
+          stockIssues.push(
+            `Only ${product.stock_quantity} units of "${item.products.name}" are available (you requested ${item.quantity}).`
+          );
+        }
+      }
+
+      if (stockIssues.length > 0) {
+        toast({
+          title: "Stock issues",
+          description: (
+            <div>
+              <p>
+                Some items in your cart are no longer available in the requested
+                quantity:
+              </p>
+              <ul className="list-disc pl-4 mt-2">
+                {stockIssues.map((issue, index) => (
+                  <li key={index}>{issue}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
 
       // If user chose to save info, update their profile
       if (formData.saveInfo) {
@@ -104,58 +152,37 @@ export default function CheckoutForm({
       const total = subtotal + shipping + tax;
 
       // Create full shipping address
-      const shippingAddress = `${formData.fullName}\n${formData.address}\n${formData.city}, ${formData.postalCode}\n${formData.country}\nPhone: ${formData.phone}`;
+      const shippingAddress = `${formData.fullName}
+${formData.address}
+${formData.city}, ${formData.postalCode}
+${formData.country}
+Phone: ${formData.phone}`;
 
-      // Create order record
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          user_id: profile.id,
-          status: "pending",
-          total_amount: total,
-          shipping_address: shippingAddress,
-          payment_method: paymentMethod,
-          payment_status: "pending",
-        })
-        .select()
-        .single();
+      // Process the order with our server action
+      const result = await processOrder({
+        userId: profile.id,
+        items: cartItems.map((item) => ({
+          productId: item.products.id,
+          quantity: item.quantity,
+        })),
+        shippingAddress,
+        paymentMethod,
+        totalAmount: total,
+      });
 
-      if (orderError) throw orderError;
-
-      // Create order items
-      const orderItems = cartItems.map((item) => ({
-        order_id: order.id,
-        product_id: item.products.id,
-        quantity: item.quantity,
-        price_at_purchase: item.products.price,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // Process payment based on selected method
-      // This would be handled by the payment components
-
-      // For demo purposes, we'll simulate a successful payment
-      await supabase
-        .from("orders")
-        .update({
-          status: "processing",
-          payment_status: "paid",
-        })
-        .eq("id", order.id);
-
-      // Clear cart
-      await supabase.from("cart_items").delete().eq("user_id", profile.id);
+      if (!result.success) {
+        throw new Error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to process order"
+        );
+      }
 
       // Refresh cart
       refreshCart();
 
       // Redirect to success page
-      router.push(`/checkout/success?orderId=${order.id}`);
+      router.push(`/checkout/success?orderId=${result.orderId}`);
     } catch (error: any) {
       toast({
         title: "Error",
